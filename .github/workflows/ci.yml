@@ -13,7 +13,7 @@ jobs:
     steps:
 
     - name: Checkout app repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Build Docker image
       run: docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
@@ -25,7 +25,7 @@ jobs:
       run: docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
 
     - name: Checkout GitOps repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: akarsh5080/gitops-repo
         token: ${{ secrets.GITHUB_TOKEN }}
