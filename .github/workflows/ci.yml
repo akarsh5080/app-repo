@@ -1,0 +1,46 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout app repo
+      uses: actions/checkout@v3
+
+    - name: Build Docker image
+      run: docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
+
+    - name: Login to GHCR
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: Push Image
+      run: docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+    - name: Checkout GitOps repo
+      uses: actions/checkout@v3
+      with:
+        repository: akarsh5080/gitops-repo
+        token: ${{ secrets.GITHUB_TOKEN }}
+        path: gitops
+
+    - name: Update Helm values
+      run: |
+        cd gitops/app-chart
+        sed -i "s/tag:.*/tag: ${{ github.sha }}/" values.yaml
+
+    - name: Commit and push
+      run: |
+        cd gitops
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+        git add .
+        git commit -m "update image tag"
+        git push
