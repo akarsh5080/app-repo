@@ -43,4 +43,4 @@ jobs:
         git config user.email "actions@github.com"
         git add .
         git commit -m "update image tag"
-        git push
+        git push https://x-access-token:${{ secrets.GITOPS_TOKEN }}@github.com/akarsh5080/gitops-repo.git
