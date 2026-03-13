@@ -11,7 +11,6 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -19,20 +18,20 @@ jobs:
     - name: Checkout app repo
       uses: actions/checkout@v4
 
-    - name: Build Docker image
-      run: docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
-
     - name: Login to GHCR
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u akarsh5080 --password-stdin
+
+    - name: Build Docker image
+      run: docker build -t ghcr.io/akarsh5080/app-repo:${{ github.sha }} .
 
     - name: Push Image
-      run: docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+      run: docker push ghcr.io/akarsh5080/app-repo:${{ github.sha }}
 
     - name: Checkout GitOps repo
       uses: actions/checkout@v4
       with:
         repository: akarsh5080/gitops-repo
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GITOPS_TOKEN }}
         path: gitops
 
     - name: Update Helm values
